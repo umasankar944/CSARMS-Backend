@@ -3,7 +3,7 @@ import express from 'express';
 import http from 'http';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import router from './routes/authRoutes.js';
+import router from './routes/routes.js';
 import { getConnection } from './models/db.js';
 
 

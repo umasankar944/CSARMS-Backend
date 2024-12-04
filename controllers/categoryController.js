@@ -1,9 +1,10 @@
+import OracleDB from "oracledb";
 import { getConnection } from "../models/db.js";
 
 export const getCategories = async (req, res) => {
     try {
         const connection = await getConnection();
-        const result = await connection.execute(`SELECT * FROM Categories`, [], { outFormat: oracledb.OUT_FORMAT_OBJECT });
+        const result = await connection.execute(`SELECT * FROM Categories`, [], { outFormat: OracleDB.OUT_FORMAT_OBJECT });
         res.status(200).json(result.rows);
     } catch (error) {
         res.status(500).json({ message: "Failed to fetch categories", error });
@@ -11,30 +12,31 @@ export const getCategories = async (req, res) => {
 };
 
 export const createCategory = async (req, res) => {
-    const { categoryName, categoryDescription } = req.body;
+    const { name, description } = req.body;
 
     try {
         const connection = await getConnection();
         await connection.execute(
-            `INSERT INTO Categories (CATEGORYNAME, CATEGORYDESCRIPTION) VALUES (:categoryName, :categoryDescription)`,
-            { categoryName, categoryDescription },
+            `INSERT INTO Categories (CATEGORYNAME, CATEGORYDESCRIPTION) VALUES (:name, :description)`,
+            { name, description },
             { autoCommit: true }
         );
         res.status(201).json({ message: "Category created successfully" });
     } catch (error) {
+        console.log(error);
         res.status(500).json({ message: "Failed to create category", error });
     }
 };
 
 export const updateCategory = async (req, res) => {
     const { categoryId } = req.params;
-    const { categoryName, categoryDescription } = req.body;
+    const { name, description } = req.body;
 
     try {
         const connection = await getConnection();
         await connection.execute(
-            `UPDATE Categories SET CATEGORYNAME = :categoryName, CATEGORYDESCRIPTION = :categoryDescription WHERE CATEGORYID = :categoryId`,
-            { categoryName, categoryDescription, categoryId },
+            `UPDATE Categories SET CATEGORYNAME = :name, CATEGORYDESCRIPTION = :description WHERE CATEGORYID = :categoryId`,
+            { name, description, categoryId },
             { autoCommit: true }
         );
         res.status(200).json({ message: "Category updated successfully" });

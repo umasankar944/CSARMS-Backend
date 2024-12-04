@@ -3,7 +3,7 @@ import express from 'express';
 import http from 'http';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import router from './routes/authRoutes.js';
+import router from './routes/routes.js';
 import { getConnection } from './models/db.js';
 
 
@@ -16,7 +16,7 @@ const PORT = 5000;
 
 // Use CORS middleware
 app.use(cors({
-  origin: 'http://localhost:3001', // Adjust this to your frontend URL
+  origin: 'http://localhost:3000', // Adjust this to your frontend URL
   methods: ['GET', 'POST','PUT','DELETE']
 }));
 

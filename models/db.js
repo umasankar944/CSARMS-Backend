@@ -1,15 +1,14 @@
 import oracledb from "oracledb";
 
-const dbConfig = {
-    user: "sys",
-    password: "Deepu",
-    connectString: "//localhost:1521/orcl",
-    privilege: oracledb.SYSDBA, // Required for SYS user
+const config = {
+    user: "system",
+    password: "123456",
+    connectString: "//localhost:1521/xepdb1", // Example: "localhost:1521/xepdb1"
 };
 
 export const getConnection = async () => {
     try {
-        const connection = await oracledb.getConnection(dbConfig);
+        const connection = await oracledb.getConnection(config);
         console.log("db connected")
         return connection;
     } catch (error) {

@@ -16,7 +16,7 @@ const PORT = 5000;
 
 // Use CORS middleware
 app.use(cors({
-  origin: 'http://localhost:3000', // Adjust this to your frontend URL
+  origin: 'http://localhost:3001', // Adjust this to your frontend URL
   methods: ['GET', 'POST','PUT','DELETE']
 }));
 

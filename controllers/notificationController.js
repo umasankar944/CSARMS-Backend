@@ -48,32 +48,27 @@ Team CSARMS` };
         transporter.sendMail(mailOptions, (error, info) => {
           if (error) {
             console.error('Error sending email:', error);
-            res.status(500).send('Error sending email');
+            return res.status(500).json({ message: "Error sending email", error: error.message, status: 500 });
           } else {
             console.log('Email sent:', info.response);
-            res.status(200).send('Email sent successfully');
+            return res.status(200).json({ message: "Email sent successfully",status: 200 });
           }
         });
       } else if (notification === 'phone') {
         client.messages.create({
           body: `Reminder: ${name}`,
           from: '+14439988811', // Your Twilio phone number
-          to: '+91 9390787290' //Recipient's phone number
+          to: "+91"+source_id //Recipient's phone number
         }).then(message => {
           console.log('SMS sent:', message.sid);
-          res.status(200).send('SMS sent successfully');
+          return res.status(200).json({ message: "SMS sent successfully",status: 200 });
         }).catch(error => {
           console.error('Error sending SMS:', error);
-          res.status(500).send('Error sending SMS');
+          return res.status(500).json({ message: "Error sending SMS",status: 500 });
         });
-    //   } else if (notification === 'push') {
-    //     const message = {
-    //         NOTIFICATION: {
-    //         title: `Reminder: ${name}`,
-    //         body: `This is a reminder for your task: ${description}`
-    //       },
-    //       token: 'recipient_device_token' // Replace with the recipient's device token
-    //     };
+      } else if (notification === 'push') {
+        console.log('Push Notification sent');
+        return res.status(200).json({ message: "Push Notification sent successfully",status: 200 });
 
     //     admin.messaging().send(message)
     //       .then(response => {
@@ -90,6 +85,6 @@ Team CSARMS` };
     schedule.scheduleJob(date, sendNotification);
   } catch (error) {
     console.error('Error scheduling notification:', error);
-    res.status(500).send('Internal server error');
+    return res.status(500).json({ message: "Internal server error",status: 500 });
   }
 };

@@ -1,6 +1,9 @@
 import OracleDB from "oracledb";
 import { getConnection } from "../models/db.js";
 import bcrypt from "bcrypt";
+import Jwt from 'jsonwebtoken';
+const TOKEN = "CSARMS";
+
 
 export const getUserDetails = async (req, res) => {
     try {
@@ -12,7 +15,7 @@ export const getUserDetails = async (req, res) => {
             const result = await connection.execute(
                 `SELECT * FROM USERS WHERE USERNAME = :username`,
                 { username: req.user.username },
-                { outFormat: oracledb.OUT_FORMAT_OBJECT }
+                { outFormat: OracleDB.OUT_FORMAT_OBJECT }
             );
 
             user = result.rows[0];
@@ -67,8 +70,8 @@ export const login = async (req, res) => {
     const { username, password } = req.body;
  console.log(username,password)
     try {
-        if (!(username && password)) {
-            return res.status(400).send("username, password, and role are required");
+        if (!username || !password) {
+            return res.status(400).json({ message: "Username and password are required", status: 400 });
         }
         const connection = await getConnection();
         const result = await connection.execute(
@@ -77,21 +80,87 @@ export const login = async (req, res) => {
             { outFormat: OracleDB.OUT_FORMAT_OBJECT }
         );
        console.log(result)
-        if (result.rows.length === 0) {
-            res.status(404).json({ message: "User not found", status:404 });
-        }
+       if (result.rows.length === 0) {
+        // User not found
+        return res.status(404).json({ message: "User not found", status: 404 });
+    }
+
 
         const user = result.rows[0];
-        const isPasswordValid = await bcrypt.compare(password, user.PASSWORD);
+         // Validate password
+         const isPasswordValid = await bcrypt.compare(password, user.PASSWORD);
+         if (!isPasswordValid) {
+             return res.status(401).json({ message: "Invalid credentials", status: 401 });
+         }
+ 
+         // Generate JWT token
+         const token = Jwt.sign(
+             { id: user.ID, username: user.USERNAME }, // Include more info in payload as needed
+            TOKEN, // Ensure the secret key is loaded from environment variables
+             { expiresIn: "1h" } // Token expiration
+         );
+        // Send response
+        return res.status(200).json({
+            message: "Login successful",
+            status: 200,
+            user: {
+                id: user.USERID,
+                username: user.USERNAME,
+                firstname: user.FIRSTNAME,
+                lastname: user.LASTNAME,
+                email: user.EMAIL,
+                phone: user.PHONE,
+                token,
+            },
+        });
 
-        if (!isPasswordValid) {
-            res.status(401).json({ message: "Invalid credentials", status:401 });
-        }
-
-        res.status(200).json({ message: "Login successful", user, status:200 });
     } catch (error) {
         console.error("Error during login:", error);
 
-        res.status(500).json({ message: "Login failed", error , status:500});
+        return res.status(500).json({ message: "Login failed", error: error.message, status: 500 });
+
     }
+};
+
+export const changePassword = async (req, res) => {
+    const { username, oldPassword, newPassword } = req.body;
+    console.log(username, oldPassword, newPassword)
+    try {
+        const connection = await getConnection();
+
+        // Check if the user exists
+        const userResult = await connection.execute(
+            `SELECT * FROM USERS WHERE USERNAME = :username`,
+            { username }
+        );
+
+        if (userResult.rows.length === 0) {
+            return res.status(404).json({ message: "User not found", status: 404 });
+        }
+        
+        const user = userResult.rows[0];
+        console.log(user)
+        const storedPassword = user[2]; // Assuming PASSWORD is the column name in your USERS table
+
+        // Verify the old password
+        const isPasswordValid = await bcrypt.compare(oldPassword, storedPassword);
+        if (!isPasswordValid) {
+            return res.status(400).json({ message: "Old password is incorrect", status: 400 });
+        }
+
+        // Hash the new password
+        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+        // Update the password in the database
+        await connection.execute(
+            `UPDATE USERS SET PASSWORD = :newPassword WHERE USERNAME = :username`,
+            { newPassword: hashedNewPassword, username },
+            { autoCommit: true }
+        );
+
+        res.status(200).json({ message: "Password changed successfully", status: 200 });
+    } catch (error) {
+        console.error("Error in changePassword:", error);
+        res.status(500).json({ message: "Password change failed", error, status: 500 });
+    }
 };

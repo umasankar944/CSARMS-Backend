@@ -21,10 +21,10 @@ export const createTask = async (req, res) => {
         { autoCommit: true }
       );
   
-      res.status(201).json({     message: 'Task created successfully', taskId: result.lastRowid });
+      res.status(201).json({     message: 'Task created successfully', taskId: result.lastRowid ,status:201});
     } catch (error) {
         console.log(error)
-      res.status(500).json({ message: 'Failed to create task', error });
+      res.status(500).json({ message: 'Failed to create task', error,status:500 });
     } finally {
       if (connection) {
         await connection.close();
@@ -52,7 +52,7 @@ export const createTask = async (req, res) => {
         res.status(200).json(result.rows);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Failed to fetch tasks', error });
+        res.status(500).json({ message: 'Failed to fetch tasks', error,status:500 });
     } finally {
         if (connection) {
             await connection.close();
@@ -85,13 +85,13 @@ export const createTask = async (req, res) => {
       );
   
       if (result.rowsAffected === 0) {
-        res.status(404).json({ message: 'Task not found' });
+        res.status(404).json({ message: 'Task not found',status:404 });
       } else {
-        res.status(200).json({ message: 'Task updated successfully' });
+        res.status(200).json({ message: 'Task updated successfully',status:200 });
       }
     } catch (error) {
         console.log(error)
-      res.status(500).json({ message: 'Failed to update task', error });
+      res.status(500).json({ message: 'Failed to update task', error, status:500 });
     } finally {
       if (connection) {
         await connection.close();
@@ -116,13 +116,13 @@ export const createTask = async (req, res) => {
       );
   
       if (result.rowsAffected === 0) {
-        res.status(404).json({ message: 'Task not found' });
+        res.status(404).json({ message: 'Task not found',status:404 });
       } else {
         res.status(200).json({ message: 'Task deleted successfully' });
       }
     } catch (error) {
         console.log(error)
-      res.status(500).json({ message: 'Failed to delete task', error });
+      res.status(500).json({ message: 'Failed to delete task', error ,status:500});
     } finally {
       if (connection) {
         await connection.close();

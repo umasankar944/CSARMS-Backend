@@ -13,37 +13,36 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// const accountSid = 'your_twilio_account_sid'; // Your Twilio account SID
-// const authToken = 'your_twilio_auth_token'; // Your Twilio auth token
-// const client = twilio(accountSid, authToken);
+
+const client = twilio(accountSid, authToken);
 
 export const notifications = async (req, res) => {
   try {
     console.log("Came to notificatios")
-    const { name, description, scheduler, notification } = req.body;
+    const { name, description, scheduler, notification, source_id } = req.body;
     // Log the incoming schedule time 
     console.log(`Received schedule time from frontend: ${scheduler}`); 
     // Convert the scheduleTime to the correct timezone 
     const date = moment.tz(scheduler, 'Asia/Kolkata').toDate(); 
     // Adjust the timezone as needed 
     // Log the parsed date 
-    console.log(`Scheduling notification for: ${date}`);
+    console.log(`Scheduling notification for: ${date} to ${source_id}` );
 
     const sendNotification = () => {
         if (notification === 'email') 
             { const mailOptions = 
                 { from: 'hiteshreddy2181@gmail.com', 
-                to: 'anushavanipentamsbi9@gmail.com', 
+                to: source_id, 
                 subject: `Reminder: ${name}`, 
                 text: `
-                Hello, 
+Hello, 
 
-                This is a friendly reminder for your task: ${name} 
-                ${description} 
-                Please make sure to complete it on time. 
-                
-                Thank you, 
-                Team CSARMS` };
+This is a friendly reminder for your task: ${name} 
+${description} 
+Please make sure to complete it on time. 
+
+Thanks & Regards, 
+Team CSARMS` };
           
 
         transporter.sendMail(mailOptions, (error, info) => {
@@ -55,18 +54,18 @@ export const notifications = async (req, res) => {
             res.status(200).send('Email sent successfully');
           }
         });
-    //   } else if (notification === 'phone') {
-    //     client.messages.create({
-    //       body: `Reminder: ${name}`,
-    //       from: '+1234567890', // Your Twilio phone number
-    //       to: '+0987654321' // Recipient's phone number
-    //     }).then(message => {
-    //       console.log('SMS sent:', message.sid);
-    //       res.status(200).send('SMS sent successfully');
-    //     }).catch(error => {
-    //       console.error('Error sending SMS:', error);
-    //       res.status(500).send('Error sending SMS');
-    //     });
+      } else if (notification === 'phone') {
+        client.messages.create({
+          body: `Reminder: ${name}`,
+          from: '+14439988811', // Your Twilio phone number
+          to: '+91 9390787290' //Recipient's phone number
+        }).then(message => {
+          console.log('SMS sent:', message.sid);
+          res.status(200).send('SMS sent successfully');
+        }).catch(error => {
+          console.error('Error sending SMS:', error);
+          res.status(500).send('Error sending SMS');
+        });
     //   } else if (notification === 'push') {
     //     const message = {
     //         NOTIFICATION: {

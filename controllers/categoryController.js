@@ -3,8 +3,9 @@ import { getConnection } from "../models/db.js";
 
 export const getCategories = async (req, res) => {
     try {
+        const { userId } = req.params;
         const connection = await getConnection();
-        const result = await connection.execute(`SELECT * FROM Categories`, [], { outFormat: OracleDB.OUT_FORMAT_OBJECT });
+        const result = await connection.execute(`SELECT * FROM Categories WHERE USERID = :userId`,  { userId }, { outFormat: OracleDB.OUT_FORMAT_OBJECT });
         res.status(200).json(result.rows);
     } catch (error) {
         res.status(500).json({ message: "Failed to fetch categories", error });
@@ -12,13 +13,13 @@ export const getCategories = async (req, res) => {
 };
 
 export const createCategory = async (req, res) => {
-    const { name, description } = req.body;
+    const { name, description, userId} = req.body;
 
     try {
         const connection = await getConnection();
         await connection.execute(
-            `INSERT INTO Categories (CATEGORYNAME, CATEGORYDESCRIPTION) VALUES (:name, :description)`,
-            { name, description },
+            `INSERT INTO Categories (CATEGORYNAME, CATEGORYDESCRIPTION, USERID) VALUES (:name, :description, :userId)`,
+            { name, description,userId },
             { autoCommit: true }
         );
         res.status(201).json({ message: "Category created successfully" });

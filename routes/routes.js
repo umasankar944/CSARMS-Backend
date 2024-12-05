@@ -8,7 +8,7 @@ const router = express.Router();
 router.post("/register", register);
 router.post("/login", login);
 router.post("/getUserDetails", getUserDetails)
-router.get("/categories", getCategories);
+router.get("/categories/:userId", getCategories);
 router.post("/categories", createCategory);
 router.put("/categories/:categoryId", updateCategory);
 router.delete("/categories/:categoryId", deleteCategory);

@@ -1,5 +1,5 @@
 import express from "express";
-import { login, register, getUserDetails, changePassword} from "../controllers/authController.js";
+import { login, register, getUserDetails, changePassword, updateUserDetails} from "../controllers/authController.js";
 import { createCategory, deleteCategory, getCategories, updateCategory } from "../controllers/categoryController.js";
 import { createTask, deleteTask, getTasks, updateTask } from "../controllers/taskController.js";
 import { notifications } from "../controllers/notificationController.js";
@@ -19,4 +19,5 @@ router.delete("/tasks/:taskId", deleteTask);
 router.post("/notification",notifications)
 router.post("/change-password",changePassword);
 router.get("/details",verifyToken, getUserDetails)
+router.post("/profile",updateUserDetails);
 export default router;

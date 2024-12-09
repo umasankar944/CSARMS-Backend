@@ -13,7 +13,6 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-
 const client = twilio(accountSid, authToken);
 
 export const notifications = async (req, res) => {
@@ -57,8 +56,8 @@ Team CSARMS` };
       } else if (notification === 'phone') {
         client.messages.create({
           body: `Reminder: ${name}`,
-          from: '+14439988811', // Your Twilio phone number
-          to: "+91"+source_id //Recipient's phone number
+          from: source_id, // Your Twilio phone number
+          to: source_id //Recipient's phone number
         }).then(message => {
           console.log('SMS sent:', message.sid);
           return res.status(200).json({ message: "SMS sent successfully",status: 200 });
@@ -69,16 +68,6 @@ Team CSARMS` };
       } else if (notification === 'push') {
         console.log('Push Notification sent');
         return res.status(200).json({ message: "Push Notification sent successfully",status: 200 });
-
-    //     admin.messaging().send(message)
-    //       .then(response => {
-    //         console.log('Push notification sent:', response);
-    //         res.status(200).send('Push notification sent successfully');
-    //       })
-    //       .catch(error => {
-    //         console.error('Error sending push notification:', error);
-    //         res.status(500).send('Error sending push notification');
-    //       });
        }
      };
 

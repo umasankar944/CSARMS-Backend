@@ -21,7 +21,7 @@ export const createTask = async (req, res) => {
         { autoCommit: true }
       );
   
-      res.status(201).json({     message: 'Task created successfully', taskId: result.lastRowid ,status:201});
+      res.status(201).json({message: 'Task created successfully', taskId: result.lastRowid ,status:201});
     } catch (error) {
         console.log(error)
       res.status(500).json({ message: 'Failed to create task', error,status:500 });

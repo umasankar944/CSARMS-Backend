@@ -164,3 +164,40 @@ export const changePassword = async (req, res) => {
         res.status(500).json({ message: "Password change failed", error, status: 500 });
     }
 };
+
+export const updateUserDetails = async (req, res) => {
+    const { username, firstName, lastName, email, phone } = req.body;
+    console.log(firstName,lastName,email,phone)
+    try {
+        const connection = await getConnection();
+
+        if (!firstName || !lastName || !email || !phone) 
+            { return res.status(400).json({ error: 'All fields are required' }); 
+        }
+
+        // Check if the user exists
+        const userResult = await connection.execute(
+            `SELECT * FROM USERS WHERE USERNAME = :username`,
+            { username }
+        );
+
+        if (userResult.rows.length === 0) {
+            return res.status(404).json({ message: "User not found", status: 404 });
+        }
+        
+        const user = userResult.rows[0];
+        console.log(user)
+
+        // Update the details in the database
+        await connection.execute(
+            `UPDATE USERS SET FIRSTNAME = :firstName, LASTNAME = :lastName, EMAIL = :email, PHONE = :phone WHERE USERNAME = :username`,
+            { firstName: firstName, lastName: lastName, email: email, phone: phone, username:username },
+            { autoCommit: true }
+        );
+
+        res.status(200).json({ message: "User Details Updated successfully", status: 200 });
+    } catch (error) {
+        console.error("Error in updating the details:", error);
+        res.status(500).json({ message: "Updating details failed", error, status: 500 });
+    }
+};

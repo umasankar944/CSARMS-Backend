@@ -1,9 +1,11 @@
 import OracleDB from "oracledb";
 import { getConnection } from "../models/db.js";
 
+import path from 'path';
 export const createTask = async (req, res) => {
-    const { taskName, taskDescription, taskSchedule, notification, categoryId } = req.body;
-  
+    const { taskName, taskDescription, taskSchedule, notification, categoryId,file } = req.body;
+    const filePath = path.join(req.file.filename); // Use relative path for file storage
+
     if (!taskName || !taskSchedule || !categoryId) {
       res.status(400);
       throw new Error('Please provide taskName, taskSchedule, and categoryId');
@@ -15,9 +17,9 @@ export const createTask = async (req, res) => {
       //connection = await oracledb.getConnection(dbConfig);
   
       const result = await connection.execute(
-        `INSERT INTO tasks (TASK_NAME, TASK_DESCRIPTION, TASK_SCHEDULE, NOTIFICATION, CATEGORY_ID) 
-         VALUES (:taskName, :taskDescription, TO_DATE(:taskSchedule, 'YYYY-MM-DD HH24:MI:SS'), :notification, :categoryId)`,
-        { taskName, taskDescription, taskSchedule, notification, categoryId },
+        `INSERT INTO tasks (TASK_NAME, TASK_DESCRIPTION, TASK_SCHEDULE, NOTIFICATION, CATEGORY_ID,TASK_ATTACHMENT) 
+         VALUES (:taskName, :taskDescription, TO_DATE(:taskSchedule, 'YYYY-MM-DD HH24:MI:SS'), :notification, :categoryId,:filePath)`,
+        { taskName, taskDescription, taskSchedule, notification, categoryId ,filePath},
         { autoCommit: true }
       );
   
@@ -42,7 +44,7 @@ export const createTask = async (req, res) => {
         const result = await connection.execute(
             `SELECT TASK_ID, TASK_NAME, TASK_DESCRIPTION, 
                     TO_CHAR(TASK_SCHEDULE, 'YYYY-MM-DD"T"HH24:MI:SS') AS TASK_SCHEDULE, 
-                    NOTIFICATION, CATEGORY_ID 
+                    NOTIFICATION, CATEGORY_ID ,TASK_ATTACHMENT
              FROM tasks 
              WHERE CATEGORY_ID = :categoryId`, // Use a WHERE clause
             { categoryId }, // Bind the categoryId

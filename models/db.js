@@ -5,6 +5,7 @@ const config = {
     password: "123456",
     connectString: "//localhost:1521/xepdb1", // Example: "localhost:1521/xepdb1"
 };
+ 
 
 export const getConnection = async () => {
     try {

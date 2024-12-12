@@ -1,5 +1,5 @@
 import express from "express";
-import { login, register, getUserDetails, changePassword } from "../controllers/authController.js";
+import { login, register, getUserDetails, changePassword,updateUserDetails } from "../controllers/authController.js";
 import { createCategory, deleteCategory, getCategories, updateCategory } from "../controllers/categoryController.js";
 import { createTask, deleteTask, getTasks, updateTask } from "../controllers/taskController.js";
 import { notifications } from "../controllers/notificationController.js"
@@ -55,7 +55,7 @@ router.get('/download/:fileName', (req, res) => {
 router.post("/register", register);
 router.post("/login", login);
 router.post("/change-password",changePassword);
-router.get("/getUserDetails",verifyToken, getUserDetails)
+router.get("/details",verifyToken, getUserDetails)
 router.get("/categories/:userId", getCategories);
 router.post("/categories", createCategory);
 router.put("/categories/:categoryId", updateCategory);
@@ -65,4 +65,5 @@ router.post("/tasks",  upload.single('file'),createTask);
 router.put("/tasks/:taskId", updateTask);
 router.delete("/tasks/:taskId", deleteTask);
 router.post("/notification",notifications)
+router.post("/profile",updateUserDetails)
 export default router;
